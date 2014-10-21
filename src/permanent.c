@@ -3,6 +3,7 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #include <math.h>
+#include <complex.h> 
 
 // Forward function declaration.
 static PyObject *permanent(PyObject *self, PyObject *args); 
@@ -22,6 +23,7 @@ PyMODINIT_FUNC initpermanent(void) {
 /*****************************************************************************
  * Array access macros.                                                      *
  *****************************************************************************/
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #define m(x0) (*(npy_float64*)((PyArray_DATA(py_m) +                \
                                 (x0) * PyArray_STRIDES(py_m)[0])))
 #define m_shape(i) (py_m->dimensions[(i)])
@@ -44,7 +46,7 @@ PyMODINIT_FUNC initpermanent(void) {
 static PyObject *permanent(PyObject *self, PyObject *args) {
   // Declare variables. 
   npy_int64 d, i, j;
-  Py_complex sum;
+  double complex sum;
   PyArrayObject *submatrix;
 
   // Parse variables. 
@@ -55,10 +57,12 @@ static PyObject *permanent(PyObject *self, PyObject *args) {
   // Compute the permanent
   for(i = 0; i < d; ++i) {
     for(j = 0; j<d; ++j) {
-
+        sum+=1j;
     }
   }
 
-  PyObject *output=PyComplex_FromCComplex(sum);
+  // Convert to a python complex number
+  Py_complex psum;
+  PyObject *output=PyComplex_FromCComplex(psum);
   return output;
 }
