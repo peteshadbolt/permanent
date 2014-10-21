@@ -41,57 +41,14 @@ PyMODINIT_FUNC initpermanent(void) {
                                     (x1) * PyArray_STRIDES(py_F)[1])))
 #define F_shape(i) (py_F->dimensions[(i)])
 
-
-/*****************************************************************************
- * compute_F                                                                 *
- *****************************************************************************/
-static inline void compute_F(npy_int64 N,
-                             PyArrayObject *py_m,
-                             PyArrayObject *py_r,
-                             PyArrayObject *py_F) {
-  npy_int64 i, j;
-  npy_float64 sx, sy, Fx, Fy, s3, tmp;
-  
-  // Set all forces to zero. 
-  for(i = 0; i < N; ++i) {
-    F(i, 0) = F(i, 1) = 0;
-  }
-  
-  // Compute forces between pairs of bodies.
-  for(i = 0; i < N; ++i) {
-    for(j = i + 1; j < N; ++j) {
-      sx = r(j, 0) - r(i, 0);
-      sy = r(j, 1) - r(i, 1);
-
-      s3 = sqrt(sx*sx + sy*sy);
-      s3 *= s3 * s3;
-
-      tmp = m(i) * m(j) / s3;
-      Fx = tmp * sx;
-      Fy = tmp * sy;
-
-      F(i, 0) += Fx;
-      F(i, 1) += Fy;
-
-      F(j, 0) -= Fx;
-      F(j, 1) -= Fy;
-    }
-  }
-}
-
 static PyObject *permanent(PyObject *self, PyObject *args) {
   // Declare variables. 
   npy_int64 d, i, j;
-  npy_float64 output;
+  Py_complex sum;
   PyArrayObject *submatrix;
 
   // Parse variables. 
-  if (!PyArg_ParseTuple(args, "ldllO!O!O!O!",
-                        &threads,
-                        &dt,
-                        &steps,
-                        &N,
-                        &PyArray_Type, &submatrix)) {
+  if (!PyArg_ParseTuple(args, "O!", &PyArray_Type, &submatrix)) {
     return NULL;
   }
 
@@ -102,5 +59,6 @@ static PyObject *permanent(PyObject *self, PyObject *args) {
     }
   }
 
-  Py_RETURN_NONE;
+  PyObject *output=PyComplex_FromCComplex(sum);
+  return output;
 }

@@ -11,7 +11,7 @@ setup(name             = "loqcmath",
       url              = "https://www.peteshadbolt.co.uk",
       ext_modules      = [
           Extension(
-              'perm_c', ['src/perm_c'],
+              'permanent', ['src/permanent.c'],
               extra_compile_args=["-Ofast", "-march=native"]),
       ], 
       
