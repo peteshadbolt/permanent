@@ -62,7 +62,7 @@ static PyObject *permanent(PyObject *self, PyObject *args) {
   }
 
   // Convert to a python complex number
-  Py_complex psum;
+  /*Py_complex psum = struct {};*/ //fromdouble
   PyObject *output=PyComplex_FromCComplex(psum);
   return output;
 }
