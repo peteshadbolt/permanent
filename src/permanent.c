@@ -1,5 +1,6 @@
 /* Computes the permanent, given a numpy array */
 
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <Python.h>
 #include <numpy/arrayobject.h>
 #include <math.h>
@@ -23,7 +24,6 @@ PyMODINIT_FUNC initpermanent(void) {
 /*****************************************************************************
  * Array access macros.                                                      *
  *****************************************************************************/
-#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #define m(x0) (*(npy_float64*)((PyArray_DATA(py_m) +                \
                                 (x0) * PyArray_STRIDES(py_m)[0])))
 #define m_shape(i) (py_m->dimensions[(i)])
@@ -44,15 +44,30 @@ PyMODINIT_FUNC initpermanent(void) {
 #define F_shape(i) (py_F->dimensions[(i)])
 
 static PyObject *permanent(PyObject *self, PyObject *args) {
-  // Declare variables. 
-  npy_int64 d, i, j;
-  double complex sum;
+  // Parse input
   PyArrayObject *submatrix;
-
-  // Parse variables. 
   if (!PyArg_ParseTuple(args, "O!", &PyArray_Type, &submatrix)) {
     return NULL;
   }
+
+  // Declare variables. 
+  /*npy_int64 d, i, j;*/
+
+
+  Py_complex a;
+  Py_complex b;
+
+  a.real=1; a.imag=1;
+  b.real=1; b.imag=1;
+
+  a.real=a.real+b.real;
+  a.imag=a.imag+b.imag;
+
+  // Convert to a python complex number
+  PyObject *output=PyComplex_FromDoubles(a.real,a.imag);
+  return output;
+
+  /*
 
   // Compute the permanent
   for(i = 0; i < d; ++i) {
@@ -60,9 +75,6 @@ static PyObject *permanent(PyObject *self, PyObject *args) {
         sum+=1j;
     }
   }
+  */
 
-  // Convert to a python complex number
-  /*Py_complex psum = struct {};*/ //fromdouble
-  PyObject *output=PyComplex_FromCComplex(psum);
-  return output;
 }
