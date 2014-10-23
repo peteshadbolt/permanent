@@ -6,7 +6,7 @@
 #include <math.h>
 #include <complex.h> 
 
-// Forward function declaration.
+// Boilerplate: Forward function declaration.
 static PyObject *permanent(PyObject *self, PyObject *args); 
 
 // Boilerplate: method list.
@@ -21,13 +21,11 @@ PyMODINIT_FUNC initpermanent(void) {
   import_array();
 }
 
-/*****************************************************************************
- * Array access macros.                                                      *
- *****************************************************************************/
-#define r(x0, x1) (*(npy_float64*)((PyArray_DATA(py_r) +                \
-                                    (x0) * PyArray_STRIDES(py_r)[0] +   \
-                                    (x1) * PyArray_STRIDES(py_r)[1])))
-#define r_shape(i) (py_r->dimensions[(i)])
+// Array access macros.
+#define SM(x0, x1) (*(npy_complex128*)((PyArray_DATA(submatrix) + \
+                    (x0) * PyArray_STRIDES(submatrix)[0] +  \
+                    (x1) * PyArray_STRIDES(submatrix)[1])))
+#define SM_shape(x0) (int) PyArray_DIM(submatrix, x0)
 
 static PyObject *permanent(PyObject *self, PyObject *args) {
   // Parse input
@@ -36,35 +34,25 @@ static PyObject *permanent(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  // Testing algebra
-  npy_complex128 a;
+  // Check for stupid mistakes
+  if ((int) PyArray_NDIM(submatrix) != 2) {return NULL;}
+  int d = (int) PyArray_DIM(submatrix, 0);
+  if ((int) PyArray_DIM(submatrix, 1) != d) {return NULL;}
 
-  /*a.real=1; a.imag=1;*/
-  /*b.real=1; b.imag=1;*/
+  // This number ends up being the permanent
+  npy_complex64 p;
+  p.real=0; p.imag=0;
 
-  /*a.real=a.real+b.real;*/
-  /*a.imag=a.imag+b.imag;*/
-
-  // Let's see if we can add to a number from the numpy array
-  int xpos=0; int ypos=0;
-  a=(*(npy_complex128*)((PyArray_DATA(submatrix) +                \
-                     (xpos) * PyArray_STRIDES(submatrix)[0] +   \
-                     (ypos) * PyArray_STRIDES(submatrix)[1])));
-
-
-
-  // Convert to a python complex number and return
-  PyObject *output=PyComplex_FromDoubles(a.real,a.imag);
-  return output;
-
-  /*
-
-  // Compute the permanent
-  for(i = 0; i < d; ++i) {
-    for(j = 0; j<d; ++j) {
-        sum+=1j;
+  int i, j;
+  for (i = 0; i < d; ++i) {
+    for (j = 0; j<d; ++j) {
+      npy_complex128 q = SM(0,0);
+      p.real += q.real;
+      p.imag += q.imag;
     }
   }
-  */
 
+  // Convert to a python complex number and return
+  PyObject *output=PyComplex_FromDoubles(p.real,p.imag);
+  return output;
 }
