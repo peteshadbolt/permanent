@@ -24,24 +24,10 @@ PyMODINIT_FUNC initpermanent(void) {
 /*****************************************************************************
  * Array access macros.                                                      *
  *****************************************************************************/
-#define m(x0) (*(npy_float64*)((PyArray_DATA(py_m) +                \
-                                (x0) * PyArray_STRIDES(py_m)[0])))
-#define m_shape(i) (py_m->dimensions[(i)])
-
 #define r(x0, x1) (*(npy_float64*)((PyArray_DATA(py_r) +                \
                                     (x0) * PyArray_STRIDES(py_r)[0] +   \
                                     (x1) * PyArray_STRIDES(py_r)[1])))
 #define r_shape(i) (py_r->dimensions[(i)])
-
-#define v(x0, x1) (*(npy_float64*)((PyArray_DATA(py_v) +                \
-                                    (x0) * PyArray_STRIDES(py_v)[0] +   \
-                                    (x1) * PyArray_STRIDES(py_v)[1])))
-#define v_shape(i) (py_v->dimensions[(i)])
-
-#define F(x0, x1) (*(npy_float64*)((PyArray_DATA(py_F) +              \
-                                    (x0) * PyArray_STRIDES(py_F)[0] +   \
-                                    (x1) * PyArray_STRIDES(py_F)[1])))
-#define F_shape(i) (py_F->dimensions[(i)])
 
 static PyObject *permanent(PyObject *self, PyObject *args) {
   // Parse input
@@ -50,20 +36,24 @@ static PyObject *permanent(PyObject *self, PyObject *args) {
     return NULL;
   }
 
-  // Declare variables. 
-  /*npy_int64 d, i, j;*/
+  // Testing algebra
+  npy_complex128 a;
+
+  /*a.real=1; a.imag=1;*/
+  /*b.real=1; b.imag=1;*/
+
+  /*a.real=a.real+b.real;*/
+  /*a.imag=a.imag+b.imag;*/
+
+  // Let's see if we can add to a number from the numpy array
+  int xpos=0; int ypos=0;
+  a=(*(npy_complex128*)((PyArray_DATA(submatrix) +                \
+                     (xpos) * PyArray_STRIDES(submatrix)[0] +   \
+                     (ypos) * PyArray_STRIDES(submatrix)[1])));
 
 
-  Py_complex a;
-  Py_complex b;
 
-  a.real=1; a.imag=1;
-  b.real=1; b.imag=1;
-
-  a.real=a.real+b.real;
-  a.imag=a.imag+b.imag;
-
-  // Convert to a python complex number
+  // Convert to a python complex number and return
   PyObject *output=PyComplex_FromDoubles(a.real,a.imag);
   return output;
 
