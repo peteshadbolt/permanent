@@ -26,7 +26,7 @@ PyMODINIT_FUNC initpermanent(void) {
 }
 
 // Array access macros.
-#define SM(x0, x1) (*(npy_complex128*)((PyArray_DATA(submatrix) + \
+#define SM(x0, x1) (*(npy_complex64*)((PyArray_DATA(submatrix) + \
                     (x0) * PyArray_STRIDES(submatrix)[0] +  \
                     (x1) * PyArray_STRIDES(submatrix)[1])))
 #define SM_shape(x0) (int) PyArray_DIM(submatrix, x0)
@@ -40,12 +40,36 @@ static npy_complex64 perm_ryser(void) {
   int i, j;
   for (i = 0; i < size; ++i) {
     for (j = 0; j < size; ++j) {
-      npy_complex128 q = SM(0,0);
+      npy_complex64 q = SM(0,0);
       p.real += q.real;
       p.imag += q.imag;
     }
   }
   return p;
+}
+
+void TODO(void) {
+    int n = size;
+    int i = 0; int z = 0; int y = 0;
+    npy_complex64 perm; perm.real=0; perm.imag=0; 
+    npy_complex64 prod; 
+    npy_complex64 sum; sum.real=0; sum.imag=0; 
+    npy_complex64 element;
+    int exp=pow(2.0, n);
+
+    // Iterate over exponentially many index strings
+    for (i=0; i<exp; ++i) {
+        prod.real = 1; prod.imag=0;
+        for (y=0; y<n; ++y) {               // Rows
+            sum.real = 0; sum.imag = 0;
+            for (z=0; z<n; ++z) {           // Columns
+                if ((i & (1 << z)) > 0) { sum.real += SM(z,y).real;  sum.imag += SM(z,y).imag; }
+            }
+            prod = prod*sum;
+        }
+        perm += parity(i) * prod;
+    }
+    return (pow(-1,n))*perm;
 }
 
 // This is basically a wrapper which chooses the optimal permanent function
