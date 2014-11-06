@@ -3,10 +3,12 @@ import time
 import multiprocessing as mp
 import numpy as np
 import lib
+import time
 
-dimension=8
-real=np.random.uniform(0,1,(dimension, dimension))
-imag=np.random.uniform(0,1,(dimension, dimension))
+dimension=2
+real=np.ones((dimension, dimension))
+imag=np.ones((dimension, dimension))
 submatrix=real+1j*imag
+print submatrix
 
-print "OUTPUT:", lib.permanent(submatrix)
+p=lib.permanent(submatrix)
