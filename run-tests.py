@@ -9,6 +9,7 @@ dimension=2
 real=np.ones((dimension, dimension))
 imag=np.ones((dimension, dimension))
 submatrix=real+1j*imag
-print submatrix
+print submatrix.dtype
 
 p=lib.permanent(submatrix)
+print p
