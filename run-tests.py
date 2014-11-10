@@ -7,9 +7,10 @@ import time
 
 dimension=2
 real=np.ones((dimension, dimension))
-imag=np.ones((dimension, dimension))
+imag=np.ones((dimension, dimension))*0
 submatrix=real+1j*imag
-print submatrix.dtype
+submatrix[0,0]*=2
+print submatrix
 
 p=lib.permanent(submatrix)
 print p
