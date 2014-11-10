@@ -13,36 +13,32 @@
 static const npy_complex128 complex_zero = {.real=0, .imag=0};
 static const npy_complex128 complex_one = {.real=1, .imag=0};
 static void complex_inc(npy_complex128 a, npy_complex128 b) { a.real+=b.real; a.imag+=b.imag;}
-static npy_complex128 complex_mult(npy_complex128 a, npy_complex128 b) { 
+static npy_complex128 complex_prod(npy_complex128 a, npy_complex128 b) { 
     npy_complex128 x;
     x.real = a.real*b.real+a.imag*b.imag;
     x.imag = a.real*b.imag+a.imag*b.real;
     return x;
 }
 
-// Boilerplate: Forward function declaration, method list, module initialization
-static PyObject *permanent(PyObject *self, PyObject *args); 
-static PyMethodDef methods[] = {
+// Boilerplate
+static PyObject *permanent(PyObject *self, PyObject *args);     // Forward function declaration
+static PyMethodDef methods[] = {                                // Method list
   { "permanent", permanent, METH_VARARGS, "Compute the permanent"},
   { NULL, NULL, 0, NULL } /* Sentinel */
 };
-PyMODINIT_FUNC initpermanent(void) {
+PyMODINIT_FUNC initpermanent(void) {                            // Module initialization
   (void) Py_InitModule("permanent", methods);
   import_array();
 }
 
-// The parity
-/*static int parity(int x) { return 0; }*/
-
-// Ryser's algorithm takes exponential time
-// This just calculates the sum
+// Ryser's algorithm 
 static npy_complex128 perm_ryser(PyArrayObject *submatrix) {
     int n = (int) PyArray_DIM(submatrix, 0);
     int i = 0; int z = 0; int y = 0;
     npy_complex128 prod;
     npy_complex128 perm = complex_zero;
     npy_complex128 sum = complex_zero;
-    int exp=1 << n; //TODO: use a shift operator
+    int exp = 1 << n; 
 
     // Iterate over exponentially many index strings
     for (i=0; i<exp; ++i) {
@@ -52,21 +48,22 @@ static npy_complex128 perm_ryser(PyArrayObject *submatrix) {
             for (z=0; z<n; ++z) {           // Columns
                 if ((i & (1 << z)) > 0) { complex_inc(sum, SM(z,y)); }
             }
-            prod = complex_mult(prod, sum);
+            prod = complex_prod(prod, sum);
         }
-        /*complex_add(perm, parity(i) * prod);*/
+        if (i%2 == 0) {prod.real*=-1; prod.imag*=-1;}
         complex_inc(perm, prod);
     }
-    /*return c_prod((pow(-1,n)), perm); #TODO power is fucked*/
+    if (i%2 == 0) {perm.real*=-1; perm.imag*=-1;}
     return perm;
 }
 
-// This is basically a wrapper which chooses the optimal permanent function
+// This is a wrapper which chooses the optimal permanent function
 static PyObject *permanent(PyObject *self, PyObject *args) {
-  // Parse input
+  // Parse the input
   PyArrayObject *submatrix;
   if (!PyArg_ParseTuple(args, "O!", &PyArray_Type, &submatrix)) {return NULL;}
 
+  // Compute the permanent
   npy_complex128 p = perm_ryser(submatrix);
   return PyComplex_FromDoubles(p.real, p.imag);
 }
