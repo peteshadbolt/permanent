@@ -36,14 +36,28 @@ PyMODINIT_FUNC initpermanent(void) {                            // Module initia
   import_array();
 }
 
+inline int* dec2binarr(long n, int dim)
+{
+    // note: res[dim] will save the sum res[0]+...+res[dim-1]
+    int* res = (int*)calloc(dim + 1, sizeof(int));   
+    int pos = dim - 1;
+    // note: this will crash if dim < log_2(n)...
+    while (n > 0)
+    {
+        res[pos] = n % 2;
+        res[dim] += res[pos];
+        n = n / 2; // integer division        
+        pos--;
+    }
+    return res;
+}
 
 // Ryser's algorithm 
 static npy_complex128 perm_ryser(PyArrayObject *submatrix) {
     int n = (int) PyArray_DIM(submatrix, 0);
     int i = 0; int z = 0; int y = 0;
-    npy_complex128 prod;
+    npy_complex128 sum, prod;
     npy_complex128 perm = complex_zero;
-    npy_complex128 sum = complex_zero;
     int exp = 1 << n; 
 
     // Iterate over exponentially many index strings
@@ -52,16 +66,16 @@ static npy_complex128 perm_ryser(PyArrayObject *submatrix) {
         for (y=0; y<n; ++y) {               // Rows
             sum = complex_zero;
             for (z=0; z<n; ++z) {           // Columns
-                if ((i & (1 << z)) > 0) { 
+                if ((i && (1 << z)) != 0) { 
                     sum = complex_add(sum, SM(z,y)); 
                 }
             }
             prod = complex_prod(prod, sum);
         }
-        /*if (i%2 == 0) {prod.real*=-1; prod.imag*=-1;}*/
+        if (i%2 == 1) {prod.real*=-1; prod.imag*=-1;}
         perm = complex_add(perm, prod);
     }
-    /*if (i%2 == 0) {perm.real*=-1; perm.imag*=-1;}*/
+    if (i%2 == 1) {perm.real*=-1; perm.imag*=-1;}
     return perm;
 }
 

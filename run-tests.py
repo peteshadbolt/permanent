@@ -16,21 +16,10 @@ def perm_ryser(a):
     terms=map(get_term, indeces) 
     return np.sum(terms)*((-1)**n)
 
-dimension=8
+dimension=2
 real=np.ones((dimension, dimension))
 imag=np.ones((dimension, dimension))*0
 submatrix=real+1j*imag
 submatrix[0,0]*=2
-print submatrix
-
-t=time.clock()
-for i in range(10000):
-    lib.permanent(submatrix)
-print time.clock()-t
-
-#t=time.clock()
-#for i in range(4000):
-    #perm_ryser(submatrix)
-#print time.clock()-t
-
-
+print lib.permanent(submatrix)
+print perm_ryser(submatrix)
