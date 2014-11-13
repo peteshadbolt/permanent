@@ -16,20 +16,23 @@ def perm_ryser(a):
     terms=map(get_term, indeces) 
     return np.sum(terms)*((-1)**n)
 
-dimension=5
+dimension=9
 real=np.random.uniform(-1, 1, dimension*dimension).reshape((dimension, dimension))
 imag=np.random.uniform(-1, 1, dimension*dimension).reshape((dimension, dimension))
 submatrix=real+1j*imag
 
-print lib.permanent(submatrix), perm_ryser(submatrix)
+#print lib.permanent(submatrix), perm_ryser(submatrix)
 
-sys.exit(0)
-t=time.clock()
-for i in range(1000):
-    perm_ryser(submatrix)
-print time.clock()-t
+#sys.exit(0)
+#t=time.clock()
+#for i in range(1000):
+    #perm_ryser(submatrix)
+#t1=time.clock()-t
 
 t=time.clock()
 for i in range(1000):
     lib.permanent(submatrix)
-print time.clock()-t
+t2=time.clock()-t
+print t2
+
+#print t1/t2
