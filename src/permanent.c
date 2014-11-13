@@ -2,51 +2,20 @@
 #define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
 #include <Python.h>
 #include <numpy/arrayobject.h>
+#include "bithacks.h"
+#include "npy_util.h"
 
-// Array access macros.
-#define SM(x0, x1) (*(npy_complex128*)((PyArray_DATA(submatrix) + \
-                    (x0) * PyArray_STRIDES(submatrix)[0] +  \
-                    (x1) * PyArray_STRIDES(submatrix)[1])))
-#define SM_shape(x0) (int) PyArray_DIM(submatrix, x0)
+// Forward function declaration 
+static PyObject *permanent(PyObject *self, PyObject *args);    
 
-int countbits(unsigned int n) 
-{
-    int q=n;
-    q = (q & 0x5555555555555555) + ((q & 0xAAAAAAAAAAAAAAAA) >> 1);
-    q = (q & 0x3333333333333333) + ((q & 0xCCCCCCCCCCCCCCCC) >> 2);
-    q = (q & 0x0F0F0F0F0F0F0F0F) + ((q & 0xF0F0F0F0F0F0F0F0) >> 4);
-    q = (q & 0x00FF00FF00FF00FF) + ((q & 0xFF00FF00FF00FF00) >> 8);
-    q = (q & 0x0000FFFF0000FFFF) + ((q & 0xFFFF0000FFFF0000) >> 16);
-    q = (q & 0x00000000FFFFFFFF) + ((q & 0xFFFFFFFF00000000) >> 32); // This last & isq't strictly qecessary.
-    return q;
-}
-
-int bitparity (unsigned int n) { return 1 - (countbits(n) & 1)*2; }
-
-
-// Complex numbers
-static const npy_complex128 complex_one = {.real=1, .imag=0};
-static const npy_complex128 complex_zero = {.real=0, .imag=0};
-static npy_complex128 complex_add(npy_complex128 a, npy_complex128 b) { 
-    npy_complex128 x;
-    x.real = a.real+b.real;
-    x.imag = a.imag+b.imag;
-    return x;
-}
-static npy_complex128 complex_prod(npy_complex128 a, npy_complex128 b) { 
-    npy_complex128 x;
-    x.real = a.real*b.real - a.imag*b.imag;
-    x.imag = a.imag*b.real + a.real*b.imag;
-    return x;
-}
-
-// Boilerplate
-static PyObject *permanent(PyObject *self, PyObject *args);     // Forward function declaration
-static PyMethodDef methods[] = {                                // Method list
+// Method list
+static PyMethodDef methods[] = {                                
   { "permanent", permanent, METH_VARARGS, "Compute the permanent"},
-  { NULL, NULL, 0, NULL } /* Sentinel */
+  { NULL, NULL, 0, NULL } // Sentinel
 };
-PyMODINIT_FUNC initpermanent(void) {                            // Module initialization
+
+// Module initialization
+PyMODINIT_FUNC initpermanent(void) {                            
   (void) Py_InitModule("permanent", methods);
   import_array();
 }
@@ -58,21 +27,18 @@ static npy_complex128 perm_ryser(PyArrayObject *submatrix) {
     npy_complex128 perm = complex_zero;
     int exp = 1 << n; 
     int i, y, z;
-
-    // Iterate over exponentially many index strings
     for (i=0; i<exp; ++i) {
         rowsumprod = complex_one;
-        for (y=0; y<n; ++y) {               // Rows
+        for (y=0; y<n; ++y) {               
             rowsum = complex_zero;
-            for (z=0; z<n; ++z) {           // Columns
-                if ((i & (1 << z)) != 0) { rowsum = complex_add(rowsum, SM(z,y)); }
+            for (z=0; z<n; ++z) { 
+                if ((i & (1 << z)) != 0) { complex_inc(&rowsum, SM(z, y)); }
             }
-            rowsumprod = complex_prod(rowsumprod, rowsum);
+            complex_multiply(&rowsumprod, rowsum);
         }
-        int sign = bitparity(i); 
-        perm.real+=sign*rowsumprod.real; perm.imag+=sign*rowsumprod.imag;
+        complex_inc(&perm, complex_float_prod(rowsumprod, bitparity(i)));
     }
-    if (n%2 == 1) {perm.real*=-1; perm.imag*=-1;}
+    if (n%2 == 1) {perm=complex_float_prod(perm, -1);}
     return perm;
 }
 
