@@ -4,6 +4,7 @@ import multiprocessing as mp
 import numpy as np
 import lib
 import time
+from matplotlib import pyplot as plt
 
 def perm_ryser(a):
     ''' the permanent calculated using the ryser formula. much faster than the naive approach '''
@@ -16,23 +17,30 @@ def perm_ryser(a):
     terms=map(get_term, indeces) 
     return np.sum(terms)*((-1)**n)
 
-dimension=9
-real=np.random.uniform(-1, 1, dimension*dimension).reshape((dimension, dimension))
-imag=np.random.uniform(-1, 1, dimension*dimension).reshape((dimension, dimension))
-submatrix=real+1j*imag
+maxtime=1
+dimensions=range(1,11)
 
-#print lib.permanent(submatrix), perm_ryser(submatrix)
+for (function, label) in zip((lib.permanent, perm_ryser), ("C", "Python")):
+    counts=[]
+    for dimension in dimensions:
+        print dimension
+        real=np.random.uniform(-1, 1, dimension*dimension).reshape((dimension, dimension))
+        imag=np.random.uniform(-1, 1, dimension*dimension).reshape((dimension, dimension))
+        submatrix=real+1j*imag
 
-#sys.exit(0)
-#t=time.clock()
-#for i in range(1000):
-    #perm_ryser(submatrix)
-#t1=time.clock()-t
+        t=time.clock()
+        n=0
+        while time.clock()-t < maxtime:
+            for i in range(5):
+                function(submatrix)
+            n+=5
+        counts.append(n)
 
-t=time.clock()
-for i in range(1000):
-    lib.permanent(submatrix)
-t2=time.clock()-t
-print t2
+    plt.plot(dimensions, counts, '.-', label=label)
 
-#print t1/t2
+plt.ylabel('Number of permanents per second')
+plt.xlabel('Dimension')
+plt.xlim(min(dimensions), max(dimensions))
+plt.legend()
+plt.semilogy()
+plt.savefig('out.pdf')

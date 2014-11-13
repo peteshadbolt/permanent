@@ -40,8 +40,8 @@ void complex_inc(npy_complex128 *a, npy_complex128 b) {
 
 // Multipy a number by another one
 void complex_multiply(npy_complex128 *a, npy_complex128 b) { 
-    npy_complex128 c = {.real=a->real, .imag=a->imag};
-    a->real  = c.real*b.real-c.imag*b.imag;
-    a->imag  = c.real*b.imag+c.imag*b.real;
+    double c = a->real;
+    a->real  = a->real*b.real-a->imag*b.imag;
+    a->imag  = c*b.imag+a->imag*b.real;
 }
 

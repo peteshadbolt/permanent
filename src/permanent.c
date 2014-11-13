@@ -4,7 +4,7 @@
 #include <numpy/arrayobject.h>
 #include "npy_util.h"
 #include "bithacks.h"
-#include "permanents.h"
+#include "ryser.h"
 
 // Forward function declaration 
 static PyObject *permanent(PyObject *self, PyObject *args);    
@@ -28,6 +28,6 @@ static PyObject *permanent(PyObject *self, PyObject *args) {
   if (!PyArg_ParseTuple(args, "O!", &PyArray_Type, &submatrix)) {return NULL;}
 
   // Compute the permanent
-  npy_complex128 p = perm_ryser(submatrix);
+  npy_complex128 p = ryser(submatrix);
   return PyComplex_FromDoubles(p.real, p.imag);
 }

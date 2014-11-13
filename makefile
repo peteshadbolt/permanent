@@ -7,7 +7,7 @@ setup = setup.py
 default : $(target) test
 
 # Compile
-$(target): $(srcdir)/permanent.c
+$(target): $(srcdir)/* 
 	python $(setup) build_ext --inplace 
 
 test : 
