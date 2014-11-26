@@ -2,9 +2,9 @@ import os, sys
 import time
 import multiprocessing as mp
 import numpy as np
-import lib
 import time
 from matplotlib import pyplot as plt
+from permanent import permanent
 
 def perm_ryser(a):
     ''' the permanent calculated using the ryser formula. much faster than the naive approach '''
@@ -20,7 +20,7 @@ def perm_ryser(a):
 maxtime=1
 dimensions=range(1,11)
 
-for (function, label) in zip((lib.permanent, perm_ryser), ("C", "Python")):
+for (function, label) in zip((permanent, perm_ryser), ("C", "Python")):
     counts=[]
     for dimension in dimensions:
         print dimension
