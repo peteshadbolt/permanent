@@ -1,4 +1,4 @@
-# Compute the Permanent
+# permanent
 Implements Ryser's algorithm for the [permanent](https://en.wikipedia.org/wiki/Permanent).
 
 Install:
