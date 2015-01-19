@@ -1,10 +1,11 @@
 # Compute the Permanent
-Implements Ryser's algorithm for the [permanent](https://en.wikipedia.org/wiki/Permanent)
-Should install with
+Implements Ryser's algorithm for the [permanent](https://en.wikipedia.org/wiki/Permanent).
+
+Install:
 ```bash
 $ pip install permanent
 ```
-Then
+Use:
 ```python
 >>> from numpy import *
 >>> from permanent import permanent
