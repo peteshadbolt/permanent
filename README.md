@@ -1,4 +1,13 @@
-# Fast functions for LOQC
-- Permanent (hardcoded up to 4x4 and Ryser)
-- Parallel permanent
-- No Cython dependency
+# Compute the Permanent
+Implements Ryser's algorithm for the [permanent](https://en.wikipedia.org/wiki/Permanent)
+Should install with
+```bash
+$ pip install permanent
+```
+Then
+```python
+>>> from numpy import *
+>>> from permanent import permanent
+>>> permanent(eye(15))
+(1-0j)
+```
