@@ -9,6 +9,6 @@ Use:
 ```python
 >>> from numpy import *
 >>> from permanent import permanent
->>> permanent(eye(15))
+>>> permanent(eye(15, dtype=complex)
 (1-0j)
 ```
