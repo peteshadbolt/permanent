@@ -48,6 +48,10 @@ static PyObject *permanent(PyObject *self, PyObject *args) {
   // Parse the input
   PyArrayObject *submatrix;
   if (!PyArg_ParseTuple(args, "O!", &PyArray_Type, &submatrix)) {return NULL;}
+  if (!PyArray_ISCOMPLEX(submatrix)) {
+      PyErr_SetString(PyExc_TypeError, "Array dtype must be `complex`.");
+      return NULL;
+  }
 
   // Compute the permanent
   npy_complex128 p = ryser(submatrix);
