@@ -14,11 +14,31 @@ static PyMethodDef methods[] = {
   { NULL, NULL, 0, NULL } // Sentinel
 };
 
-// Module initialization
+
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef cModPyDem =
+{
+    PyModuleDef_HEAD_INIT,
+    "permanent", "Computes the permanent of a numpy using the most appropriate method available",
+    -1,
+    methods
+};
+
+PyMODINIT_FUNC
+PyInit_permanent(void)
+{
+    import_array();
+    return PyModule_Create(&cModPyDem);
+}
+
+#else
+
 PyMODINIT_FUNC initpermanent(void) {                            
   (void) Py_InitModule("permanent", methods);
   import_array();
 }
+
+#endif
 
 // Ryser's algorithm 
 static npy_complex128 ryser(PyArrayObject *submatrix) {
