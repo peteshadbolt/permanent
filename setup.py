@@ -5,7 +5,7 @@ import numpy
 
 setup(
     name="permanent",
-    version="0.1.3",
+    version="0.1.4",
     description="Calculates the permanent of a Numpy matrix",
     author="Pete Shadbolt",
     author_email="hello@peteshadbolt.co.uk",
