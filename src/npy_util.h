@@ -1,5 +1,5 @@
 // Array access macros.
-#define SM(x0, x1) (*(npy_complex128*)((PyArray_DATA(submatrix) + \
+#define SM(x0, x1) (*(npy_complex128*)(((char*)PyArray_DATA(submatrix) + \
                     (x0) * PyArray_STRIDES(submatrix)[0] +  \
                     (x1) * PyArray_STRIDES(submatrix)[1])))
 #define SM_shape(x0) (int) PyArray_DIM(submatrix, x0)
