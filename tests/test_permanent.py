@@ -1,5 +1,5 @@
 import numpy as np
-from permanentbis.permanent import permanent
+from permanent.permanent import permanent
 import pytest
 
 

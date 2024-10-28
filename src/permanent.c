@@ -75,5 +75,5 @@ static PyObject *permanent(PyObject *self, PyObject *args) {
 
   // Compute the permanent
   npy_complex128 p = ryser(submatrix);
-  return PyComplex_FromDoubles(creal(p), cimag(p));
+  return PyComplex_FromDoubles(p.real, p.imag);
 }
