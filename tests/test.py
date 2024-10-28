@@ -1,5 +1,5 @@
 import numpy as np
-from permanent import permanent
+from permanentbis import permanent
 from nose.tools import raises
 
 def test_permanent():
